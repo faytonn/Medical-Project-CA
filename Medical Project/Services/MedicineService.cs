@@ -12,6 +12,7 @@ namespace Medical_Project.Services
                 {
                     Array.Resize(ref DB.Medicines, DB.Medicines.Length + 1);
                     DB.Medicines[DB.Medicines.Length - 1] = medicine;
+                    Console.WriteLine("Medicine successfully created.");
                 }
             }
             throw new Exception("Category not found.");
@@ -24,7 +25,7 @@ namespace Medical_Project.Services
 
         public Medicine GetMedicineById(int id)
         {
-            foreach(var medicine in DB.Medicines)
+            foreach (var medicine in DB.Medicines)
             {
                 if (medicine.Id == id)
                 {
@@ -36,9 +37,9 @@ namespace Medical_Project.Services
 
         public Medicine GetMedicineByName(string name)
         {
-            foreach(var medicine in DB.Medicines)
+            foreach (var medicine in DB.Medicines)
             {
-                if(medicine.Name == name)
+                if (medicine.Name == name)
                 {
                     return medicine;
                 }
@@ -48,9 +49,9 @@ namespace Medical_Project.Services
 
         public Medicine GetMedicineByCategory(int categoryId)
         {
-            foreach(var medicine in DB.Medicines)
+            foreach (var medicine in DB.Medicines)
             {
-                if(medicine.CategoryId == categoryId)
+                if (medicine.CategoryId == categoryId)
                 {
                     return medicine;
                 }
@@ -60,7 +61,7 @@ namespace Medical_Project.Services
 
         public Medicine RemoveMedicine(int id, Medicine removedMedicine)
         {
-            for(int i = 0; i < DB.Medicines.Length; i++)
+            for (int i = 0; i < DB.Medicines.Length; i++)
             {
                 if (DB.Medicines[i].Id == id)
                 {
@@ -69,6 +70,7 @@ namespace Medical_Project.Services
                         DB.Medicines[j] = DB.Medicines[j + 1];
                     }
                     Array.Resize(ref DB.Medicines, DB.Medicines.Length - 1);
+                    Console.WriteLine("Medicine successfully deleted.");
                     return removedMedicine;
                 }
             }
@@ -77,12 +79,13 @@ namespace Medical_Project.Services
 
         public void UpdateMedicine(int id, Medicine updatedMedicine)
         {
-            for(int i = 0; i < DB.Medicines.Length; i++)
+            foreach(var medicine in DB.Medicines)
             {
-                if (DB.Medicines[i].Id == id)
+                if (medicine.Id == id)
                 {
-                    DB.Medicines[i] = updatedMedicine;
-                    return;
+                    medicine.Name = updatedMedicine.Name;
+                    medicine.Price = updatedMedicine.Price;
+                    
                 }
             }
             throw new Exception("Medicine with the entered ID not found.");

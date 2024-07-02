@@ -23,10 +23,10 @@ namespace Medical_Project.Models
             CreatedDate = DateTime.Now;
         }
 
-        //public override string ToString()
-        //{
-        //    return $"{}
-        //}
+        public override string ToString()
+        {
+            return $"Category ID: {CategoryId} \tName: {Name} \tPrice: {Price} ID: \t{Id} \t{CreatedDate}";
+        }
 
     }
 }
