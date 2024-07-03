@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Medical_Project.Models
+﻿namespace Medical_Project.Models
 {
     public class Medicine : BaseEntity
     {
@@ -24,6 +22,11 @@ namespace Medical_Project.Models
         }
 
         public override string ToString()
+        {
+            return $"Category ID: {CategoryId} \tName: {Name} \tPrice: {Price} ID: \t{Id} \t{CreatedDate}";
+        }
+
+        public string GetInfo()
         {
             return $"Category ID: {CategoryId} \tName: {Name} \tPrice: {Price} ID: \t{Id} \t{CreatedDate}";
         }

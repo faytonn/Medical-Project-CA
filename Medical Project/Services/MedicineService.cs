@@ -1,4 +1,5 @@
-﻿using Medical_Project.Models;
+﻿using Medical_Project.Exceptions;
+using Medical_Project.Models;
 
 namespace Medical_Project.Services
 {
@@ -13,9 +14,10 @@ namespace Medical_Project.Services
                     Array.Resize(ref DB.Medicines, DB.Medicines.Length + 1);
                     DB.Medicines[DB.Medicines.Length - 1] = medicine;
                     Console.WriteLine("Medicine successfully created.");
+                    return;
                 }
             }
-            throw new Exception("Category not found.");
+            throw new NotFoundException("Category not found.");
         }
 
         public Medicine[] GetAllMedicines()
@@ -32,7 +34,7 @@ namespace Medical_Project.Services
                     return medicine;
                 }
             }
-            throw new Exception("Medicine with the entered ID not found.");
+            throw new NotFoundException("Medicine with the entered ID not found.");
         }
 
         public Medicine GetMedicineByName(string name)
@@ -44,7 +46,7 @@ namespace Medical_Project.Services
                     return medicine;
                 }
             }
-            throw new Exception("Medicine with the entered name not found.");
+            throw new NotFoundException("Medicine with the entered name not found.");
         }
 
         public Medicine GetMedicineByCategory(int categoryId)
@@ -56,7 +58,7 @@ namespace Medical_Project.Services
                     return medicine;
                 }
             }
-            throw new Exception("Medicine with the entered category ID not found.");
+            throw new NotFoundException("Medicine with the entered category ID not found.");
         }
 
         public Medicine RemoveMedicine(int id, Medicine removedMedicine)
@@ -74,7 +76,7 @@ namespace Medical_Project.Services
                     return removedMedicine;
                 }
             }
-            throw new Exception("Medicine with the entered ID not found.");
+            throw new NotFoundException("Medicine with the entered ID not found.");
         }
 
         public void UpdateMedicine(int id, Medicine updatedMedicine)
@@ -88,7 +90,7 @@ namespace Medical_Project.Services
                     
                 }
             }
-            throw new Exception("Medicine with the entered ID not found.");
+            throw new NotFoundException("Medicine with the entered ID not found.");
         }
 
     }

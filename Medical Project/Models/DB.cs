@@ -12,5 +12,23 @@
             Categories = new Category[0];
             Medicines = new Medicine[0];
         }
+
+        public static void MedicineGetInfo()
+        {
+            foreach (var medicine in Medicines) 
+            {
+                Console.WriteLine(medicine);
+            }
+        }
+
+        public static void CategoryGetInfo()
+        {
+            foreach(var category in Categories)
+            {
+                Console.WriteLine(category);
+            }
+        }
+
+        
     }
 }

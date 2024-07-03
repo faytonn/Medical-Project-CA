@@ -1,4 +1,5 @@
-﻿using Medical_Project.Models;
+﻿using Medical_Project.Exceptions;
+using Medical_Project.Models;
 
 namespace Medical_Project.Services
 {
@@ -14,7 +15,7 @@ namespace Medical_Project.Services
                 }
 
             }
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
         }
 
         public void AddUser(User user)
