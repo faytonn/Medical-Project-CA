@@ -2,34 +2,30 @@
 {
     public class Medicine : BaseEntity
     {
+        private static int _id;
         public string Name { get; set; }
         public double Price { get; set; }
-        private static int _categoryId;
-        public int CategoryId { get; }
-        private static int _userId;
-        public int UserId { get; }
+        public int CategoryId { get; set; }
+        public int UserId { get; set; }
         public DateTime CreatedDate { get; set; }
 
 
-        public Medicine(string name, double price)
+        public Medicine(string name, double price, int categoryId, int userId) 
         {
-            CategoryId = ++_categoryId;
-            UserId = _userId;
-
+            CategoryId = categoryId;
+            UserId = userId;
             Name = name;
             Price = price;
             CreatedDate = DateTime.Now;
+            Id = ++_id;
         }
 
         public override string ToString()
         {
-            return $"Category ID: {CategoryId} \tName: {Name} \tPrice: {Price} ID: \t{Id} \t{CreatedDate}";
+            return $"User ID: {UserId} \nCategory ID: {CategoryId} \tName: {Name} \tPrice: {Price} AZN \tID: {Id} \t{CreatedDate}";
         }
 
-        public string GetInfo()
-        {
-            return $"Category ID: {CategoryId} \tName: {Name} \tPrice: {Price} ID: \t{Id} \t{CreatedDate}";
-        }
+
 
     }
 }

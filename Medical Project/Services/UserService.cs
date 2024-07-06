@@ -9,7 +9,7 @@ namespace Medical_Project.Services
         {
             foreach (var users in DB.Users)
             {
-                if (users.Email == email && users.Password == password)
+                if (users.Email.ToLower() == email.ToLower() && users.Password == password)
                 {
                     return users;
                 }
@@ -20,8 +20,16 @@ namespace Medical_Project.Services
 
         public void AddUser(User user)
         {
+            foreach(var prospectiveUser in DB.Users)
+            {
+                if(prospectiveUser.Email == user.Email)
+                {
+                    throw new NotFoundException("User with given email already exists.");
+                }
+            }
             Array.Resize(ref DB.Users, DB.Users.Length + 1);
             DB.Users[DB.Users.Length - 1] = user;
+
         }
 
 

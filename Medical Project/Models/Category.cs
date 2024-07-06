@@ -1,15 +1,24 @@
-﻿namespace Medical_Project.Models
+﻿using System.Diagnostics;
+
+namespace Medical_Project.Models
 {
     public class Category : BaseEntity
     {
+        private static int _id;
+        public int UserId { get; set; }
         public string Name { get; set; }
-        public int CategoryId { get; }
-        private static int _categoryId;
+      
 
-        public Category(string name)
+        public Category(string name, int userId)
         {
-            CategoryId = ++_categoryId;
             Name = name;
+            Id = ++_id;
+            UserId = userId;
+        }
+
+        public override string ToString()
+        {
+            return $"Category ID: {Id} \tName: {Name}";
         }
     }
 }

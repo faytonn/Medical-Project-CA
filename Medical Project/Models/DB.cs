@@ -23,9 +23,24 @@
 
         public static void CategoryGetInfo()
         {
-            foreach(var category in Categories)
+            Console.WriteLine("> > CATEGORIES LIST < <");
+            foreach (var category in Categories)
             {
+                if(userId == category.userId)
                 Console.WriteLine(category);
+
+            }
+        }
+
+        public static void UserGetInfo()
+        {
+            Console.WriteLine("> > USERS LIST < <");
+            foreach ( var user in Users)
+            {
+                if(userId == user.Id)
+                {
+                Console.WriteLine(user);
+                }
             }
         }
 

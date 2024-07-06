@@ -1,15 +1,17 @@
 ﻿using Medical_Project.Exceptions;
 using Medical_Project.Models;
+using Medical_Project.Utilities;
 
 namespace Medical_Project.Services
 {
     public class MedicineService
     {
+
         public void CreateMedicine(Medicine medicine)
         {
             foreach (var category in DB.Categories)
             {
-                if (category.Id == medicine.CategoryId)
+                if (medicine.CategoryId == category.Id)
                 {
                     Array.Resize(ref DB.Medicines, DB.Medicines.Length + 1);
                     DB.Medicines[DB.Medicines.Length - 1] = medicine;
@@ -20,74 +22,87 @@ namespace Medical_Project.Services
             throw new NotFoundException("Category not found.");
         }
 
-        public Medicine[] GetAllMedicines()
+        public void GetAllMedicines(int userId)
         {
-            return DB.Medicines;
+           foreach(var medicine in DB.Medicines)
+            {
+                if(medicine.UserId == userId)
+                {
+                    Console.WriteLine(medicine);
+                }
+            }
         }
 
-        public Medicine GetMedicineById(int id)
+        public void GetMedicineById(int medicineId, int userId)
         {
             foreach (var medicine in DB.Medicines)
             {
-                if (medicine.Id == id)
+                if (medicine.Id == medicineId && userId == medicine.UserId)
                 {
-                    return medicine;
+                    Console.WriteLine(medicine);
+                    return;
                 }
             }
             throw new NotFoundException("Medicine with the entered ID not found.");
         }
 
-        public Medicine GetMedicineByName(string name)
+        public void GetMedicineByName(string name, int userId)
         {
             foreach (var medicine in DB.Medicines)
             {
-                if (medicine.Name == name)
+                if (medicine.Name == name && userId == medicine.UserId)
                 {
-                    return medicine;
+                    Console.WriteLine(medicine);
+                    return;
                 }
             }
             throw new NotFoundException("Medicine with the entered name not found.");
         }
 
-        public Medicine GetMedicineByCategory(int categoryId)
+        public Medicine[] GetMedicineByCategory(int categoryId)
         {
-            foreach (var medicine in DB.Medicines)
+            Medicine[] result = new Medicine[0];
+
+            for(int i = 0; i < DB.Medicines.Length; i++) 
             {
-                if (medicine.CategoryId == categoryId)
+                if (DB.Medicines[i].CategoryId == categoryId)
                 {
-                    return medicine;
+                    Array.Resize(ref result, result.Length + 1);
+                    result[^1] = DB.Medicines[i];
                 }
             }
             throw new NotFoundException("Medicine with the entered category ID not found.");
         }
 
-        public Medicine RemoveMedicine(int id, Medicine removedMedicine)
+        public void RemoveMedicine(int userId, int medicineId)
         {
             for (int i = 0; i < DB.Medicines.Length; i++)
             {
-                if (DB.Medicines[i].Id == id)
+                if (DB.Medicines[i].Id == medicineId && userId == DB.Medicines[i].UserId)
                 {
                     for (int j = 0; j < DB.Medicines.Length - 1; j++)
                     {
                         DB.Medicines[j] = DB.Medicines[j + 1];
                     }
                     Array.Resize(ref DB.Medicines, DB.Medicines.Length - 1);
-                    Console.WriteLine("Medicine successfully deleted.");
-                    return removedMedicine;
+                    Color.WriteLine("Medicine successfully deleted.", ConsoleColor.Green);
+                    return;
                 }
             }
             throw new NotFoundException("Medicine with the entered ID not found.");
         }
 
-        public void UpdateMedicine(int id, Medicine updatedMedicine)
+        public void UpdateMedicine(int id, Medicine medicine, int userId)
         {
-            foreach(var medicine in DB.Medicines)
+            for(int i = 0; i < DB.Medicines.Length; i++)
             {
-                if (medicine.Id == id)
+                if (DB.Medicines[i].Id == id && DB.Medicines[i].UserId == userId)
                 {
-                    medicine.Name = updatedMedicine.Name;
-                    medicine.Price = updatedMedicine.Price;
-                    
+                    DB.Medicines[i].Name = medicine.Name;
+                    DB.Medicines[i].Price = medicine.Price;
+                    DB.Medicines[i].CategoryId = medicine.CategoryId;
+                    Color.WriteLine("Medicine successfully updated.", ConsoleColor.Green);
+                    return;
                 }
             }
             throw new NotFoundException("Medicine with the entered ID not found.");

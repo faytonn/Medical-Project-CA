@@ -1,6 +1,7 @@
 ﻿using Medical_Project.Exceptions;
 using Medical_Project.Models;
 using Medical_Project.Services;
+using Medical_Project.Utilities;
 
 bool systemProcess = true;
 
@@ -10,24 +11,22 @@ MedicineService medicineService = new MedicineService();
 
 
 
-
 while (systemProcess)
 {
 
-    restart:
     Console.WriteLine("Welcome to the system!");
+restartSystemMenu:
+    Console.Clear();
     Console.WriteLine("> > > MENU < < <");
     Console.WriteLine("[1] Create a new user");
     Console.WriteLine("[2] Log in");
     Console.WriteLine("[3] Exit");
 
     int command = int.Parse(Console.ReadLine());
+
     switch (command)
     {
         case 1:
-            try
-            {
-                
                 Console.Write("Enter full name: ");
                 string fullName = Console.ReadLine();
 
@@ -36,11 +35,11 @@ while (systemProcess)
 
                 Console.Write("Enter password: ");
                 string password = Console.ReadLine();
-
-
+            try
+            { 
                 User user = new User(fullName, email, password);
                 userService.AddUser(user);
-                Console.WriteLine("User created successfully!");
+                Color.WriteLine("User created successfully!", ConsoleColor.Green);
             
             }
             catch (NotFoundException ex)
@@ -49,21 +48,21 @@ while (systemProcess)
             }
             break;
         case 2:
-            try
-            {
                 Console.WriteLine("Login");
+
                 Console.Write("Enter email: ");
                 string loginEmail = Console.ReadLine();
-
                 Console.Write("Enter password: ");
                 string loginPassword = Console.ReadLine();
+            try
+            {
                 User loggedInUser = userService.Login(loginEmail, loginPassword);
-                Console.WriteLine($"\nWelcome, {loggedInUser.FullName}!");
+                Color.WriteLine($"\nWelcome, {loggedInUser.FullName}!", ConsoleColor.DarkGreen);
             }
             catch (NotFoundException ex)
             {
                 Console.WriteLine(ex.Message);
-                goto restart;
+                goto restartSystemMenu;
             }
            
             
@@ -81,7 +80,8 @@ while (systemProcess)
                 Console.WriteLine("[6] Find medicine by ID");
                 Console.WriteLine("[7] Find medicine by name");
                 Console.WriteLine("[8] Find medicine by category");
-                Console.WriteLine("[9] Exit");
+                Console.WriteLine("[9] List all categories");
+                Console.WriteLine("[0] Exit");
 
                 int command2 = int.Parse(Console.ReadLine());
                 switch (command2)
@@ -91,20 +91,30 @@ while (systemProcess)
                         {
                             Console.Write("Name of category: ");
                             string categoryCreate = Console.ReadLine();
+                            
+                            foreach(var prospectiveCategory in DB.Categories) 
+                            {
+                                if(categoryCreate == prospectiveCategory.Name && loggedInUser.Id = prospectiveCategory.UserId)
+                                {
+                                    throw new NotFoundException("Category with the given name already exists");
+                                }
+                            }
 
-                            Category category = new Category(categoryCreate);
+
+                            Category category = new Category(categoryCreate, );
                             categoryService.CreateCategory(category);
                             Console.WriteLine("Category successfully created!");
                         }
                         catch (NotFoundException ex)
                         {
-                            Console.WriteLine(ex.Message);
+                            Color.WriteLine(ex.Message, ConsoleColor.Red);
                         }
                         break;
                     case 2:
                         try
                         {
-                            Console.WriteLine(DB.CategoryGetInfo);
+                            Console.WriteLine("Available categories:");
+                            DB.CategoryGetInfo();
 
                             Console.Write("Category ID: ");
                             int medicineCategoryId = int.Parse(Console.ReadLine());
@@ -116,13 +126,12 @@ while (systemProcess)
                             double medicinePrice = double.Parse(Console.ReadLine());
 
 
-                            Medicine medicine = new Medicine(medicineCreate, medicinePrice);
+                            Medicine medicine = new Medicine(medicineCreate, medicinePrice,medicineCategoryId,5);
                             medicineService.CreateMedicine(medicine);
-                            Console.WriteLine("Medicine successfully created!");
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine(ex.Message);
+                            Color.WriteLine(ex.Message, ConsoleColor.Red);
                         }
                         break;
                     case 3:
@@ -133,11 +142,13 @@ while (systemProcess)
                         restarttryAgain:
                             var findMedicineRemove = medicineService.GetMedicineById(removeID);
 
+                            int userId = 1;
+
                             Console.WriteLine($"You want to remove medicine '{findMedicineRemove}'? \t(Say 'yes' or 'no')");
                             string YesNo = Console.ReadLine();
                             if (YesNo == "yes")
                             {
-                                medicineService.RemoveMedicine(removeID, findMedicineRemove);
+                                medicineService.RemoveMedicine(userId, removeID);
                                 Console.WriteLine($"Medicine '{findMedicineRemove}' successfully deleted.");
                             }
                             else if (YesNo == "no")
@@ -164,20 +175,32 @@ while (systemProcess)
                     case 5:
                         try
                         {
+                            Console.WriteLine("Here are all the medicines available for update: ");
+                            DB.MedicineGetInfo();
+
                             Console.Write("Enter the ID of the medicine you want to update: ");
                             int updateID = int.Parse(Console.ReadLine());
 
                         restarttryAgain1:
                             var findMedicineUpdate = medicineService.GetMedicineById(updateID);
 
-                            Console.WriteLine($"You want to remove medicine '{findMedicineUpdate}'? \t(Say 'yes' or 'no')");
+                            Console.WriteLine($"You want to update medicine '{findMedicineUpdate}'? \t(Say 'yes' or 'no')");
                             string YesNoUpdate = Console.ReadLine();
                             if (YesNoUpdate == "yes")
                             {
-                                medicineService.UpdateMedicine(updateID, findMedicineUpdate);
+                                Console.Write("New name of the medicine: ");
+                                string newName = Console.ReadLine();
+                                Console.Write("New price of the medicine: ");
+                                double newPrice = double.Parse(Console.ReadLine());
+
+                                int userId = 1;
+
+
+                                Medicine newMedicine = new Medicine(newName, newPrice);
+                                medicineService.UpdateMedicine(findMedicineUpdate.Id, newMedicine, userId);
                                 Console.WriteLine($"Medicine '{findMedicineUpdate}' successfully updated.");
                             }
-                            else if (YesNoUpdate == "no")
+                            else if (YesNoUpdate.ToLower() == "no")
                             {
                                 goto restarttryAgain1;
                             }
@@ -227,6 +250,8 @@ while (systemProcess)
                         }
                         break;
                     case 9:
+
+                    case 0:
                         try
                         {
                             Console.WriteLine("Terminating program...");

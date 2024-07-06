@@ -14,5 +14,6 @@ namespace Medical_Project.Services
         {
             return DB.Categories;
         }
+        
     }
 }
