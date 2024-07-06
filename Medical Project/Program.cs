@@ -27,20 +27,20 @@ restartSystemMenu:
     switch (command)
     {
         case 1:
-                Console.Write("Enter full name: ");
-                string fullName = Console.ReadLine();
+            Console.Write("Enter full name: ");
+            string fullName = Console.ReadLine();
 
-                Console.Write("Enter email: ");
-                string email = Console.ReadLine();
+            Console.Write("Enter email: ");
+            string email = Console.ReadLine();
 
-                Console.Write("Enter password: ");
-                string password = Console.ReadLine();
+            Console.Write("Enter password: ");
+            string password = Console.ReadLine();
             try
-            { 
+            {
                 User user = new User(fullName, email, password);
                 userService.AddUser(user);
                 Color.WriteLine("User created successfully!", ConsoleColor.Green);
-            
+
             }
             catch (NotFoundException ex)
             {
@@ -48,12 +48,12 @@ restartSystemMenu:
             }
             break;
         case 2:
-                Console.WriteLine("Login");
+            Console.WriteLine("Login");
 
-                Console.Write("Enter email: ");
-                string loginEmail = Console.ReadLine();
-                Console.Write("Enter password: ");
-                string loginPassword = Console.ReadLine();
+            Console.Write("Enter email: ");
+            string loginEmail = Console.ReadLine();
+            Console.Write("Enter password: ");
+            string loginPassword = Console.ReadLine();
             try
             {
                 User loggedInUser = userService.Login(loginEmail, loginPassword);
@@ -64,8 +64,8 @@ restartSystemMenu:
                 Console.WriteLine(ex.Message);
                 goto restartSystemMenu;
             }
-           
-            
+
+
 
             bool medicineMenuSystem = true;
 
@@ -91,10 +91,10 @@ restartSystemMenu:
                         {
                             Console.Write("Name of category: ");
                             string categoryCreate = Console.ReadLine();
-                            
-                            foreach(var prospectiveCategory in DB.Categories) 
+
+                            foreach (var prospectiveCategory in DB.Categories)
                             {
-                                if(categoryCreate == prospectiveCategory.Name && loggedInUser.Id = prospectiveCategory.UserId)
+                                if (categoryCreate == prospectiveCategory.Name && loggedInUser.Id == prospectiveCategory.UserId)
                                 {
                                     throw new NotFoundException("Category with the given name already exists");
                                 }
@@ -126,7 +126,7 @@ restartSystemMenu:
                             double medicinePrice = double.Parse(Console.ReadLine());
 
 
-                            Medicine medicine = new Medicine(medicineCreate, medicinePrice,medicineCategoryId,5);
+                            Medicine medicine = new Medicine(medicineCreate, medicinePrice, medicineCategoryId, 5);
                             medicineService.CreateMedicine(medicine);
                         }
                         catch (Exception ex)
@@ -140,7 +140,7 @@ restartSystemMenu:
                             Console.Write("Enter the ID of the medicine you want to remove: ");
                             int removeID = int.Parse(Console.ReadLine());
                         restarttryAgain:
-                            var findMedicineRemove = medicineService.GetMedicineById(removeID);
+                            var findMedicineRemove = medicineService.GetMedicineById(removeID, userId);
 
                             int userId = 1;
 
@@ -196,7 +196,7 @@ restartSystemMenu:
                                 int userId = 1;
 
 
-                                Medicine newMedicine = new Medicine(newName, newPrice);
+                                Medicine newMedicine = new Medicine(newName, newPrice, categoryId, userId);
                                 medicineService.UpdateMedicine(findMedicineUpdate.Id, newMedicine, userId);
                                 Console.WriteLine($"Medicine '{findMedicineUpdate}' successfully updated.");
                             }
@@ -216,7 +216,7 @@ restartSystemMenu:
                             Console.Write("Enter the ID of the medicine you want to find: ");
                             int findMedicineByID = int.Parse(Console.ReadLine());
 
-                            Console.WriteLine(medicineService.GetMedicineById(findMedicineByID));
+                            Console.WriteLine(medicineService.GetMedicineById(findMedicineByID, userId));
                         }
                         catch (Exception ex)
                         {
@@ -229,7 +229,7 @@ restartSystemMenu:
                             Console.Write("Enter the name of the medicine you want to find: ");
                             string findMedicineByName = Console.ReadLine();
 
-                            Console.WriteLine(medicineService.GetMedicineByName(findMedicineByName));
+                            Console.WriteLine(medicineService.GetMedicineByName(findMedicineByName, userId));
                         }
                         catch (Exception ex)
                         {
@@ -277,8 +277,10 @@ restartSystemMenu:
             Console.WriteLine("Invalid option, please try again.");
             break;
     }
-
 }
+
+
+
 
 
 
