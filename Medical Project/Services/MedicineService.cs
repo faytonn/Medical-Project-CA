@@ -46,11 +46,11 @@ namespace Medical_Project.Services
             throw new NotFoundException("Medicine with the entered ID not found.");
         }
 
-        public Medicine GetMedicineByName(string name, int userId)
+        public Medicine GetMedicineByName(string medicineName, int userId)
         {
             foreach (var medicine in DB.Medicines)
             {
-                if (medicine.Name == name && userId == medicine.UserId)
+                if (medicine.Name == medicineName && userId == medicine.UserId)
                 {
                     Console.WriteLine(medicine);
                     return medicine;
@@ -65,7 +65,7 @@ namespace Medical_Project.Services
 
             for(int i = 0; i < DB.Medicines.Length; i++) 
             {
-                if (DB.Medicines[i].CategoryId == categoryId && userId == DB.Medicines[i].UserId)
+                if (DB.Medicines[i].CategoryId == categoryId && DB.Medicines[i].UserId == userId)
                 {
                     Array.Resize(ref result, result.Length + 1);
                     result[^1] = DB.Medicines[i];

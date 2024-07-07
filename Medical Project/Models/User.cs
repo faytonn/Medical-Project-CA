@@ -5,7 +5,6 @@ namespace Medical_Project.Models
     public class User : BaseEntity
     {
         private static int _id;
-        public int UserId { get; }
         public string FullName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
@@ -21,7 +20,7 @@ namespace Medical_Project.Models
 
         public override string ToString()
         {
-            return $"User ID: {UserId} \nName: {FullName} \tEmail: {Email}";
+            return $"User ID: {Id} \nName: {FullName} \tEmail: {Email}";
         }
 
 

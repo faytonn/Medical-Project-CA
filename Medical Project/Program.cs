@@ -11,12 +11,14 @@ public class Program
     static void Main(string[] args)
     {
         bool systemProcess = true;
+        bool medicineMenu = true;
 
         UserService userService = new UserService();
         CategoryService categoryService = new CategoryService();
         MedicineService medicineService = new MedicineService();
 
-        User myUser = new("", "", "");
+
+        User loggedInUser = new("", "", "");
 
         while (systemProcess)
         {
@@ -44,7 +46,7 @@ public class Program
                     string loginPassword = Console.ReadLine();
                     try
                     {
-                        User loggedInUser = userService.Login(loginEmail, loginPassword);
+                        loggedInUser = userService.Login(loginEmail, loginPassword);
                         Color.WriteLine($"\nWelcome, {loggedInUser.FullName}!", ConsoleColor.DarkGreen);
                     }
                     catch (NotFoundException ex)
@@ -69,42 +71,41 @@ public class Program
                         Console.WriteLine("[7] Find medicine by name");
                         Console.WriteLine("[8] Find medicine by category");
                         Console.WriteLine("[9] List all categories");
-                        Console.WriteLine("[0] Exit");
+                        Console.WriteLine("[0] Go back to User menu");
 
                         int command2 = int.Parse(Console.ReadLine());
                         switch (command2)
                         {
                             case 1:
-                                CreateCategory(categoryService);
+                                CreateCategory(categoryService, loggedInUser.Id);
                                 goto restartMedicineMenu;
                             case 2:
-                                CreateMedicine(medicineService);
+                                CreateMedicine(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
                             case 3:
-                                RemoveMedicine(medicineService);
+                                RemoveMedicine(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
                             case 4:
-                                ShowAllMedicines(medicineService);
+                                ShowAllMedicines(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
                             case 5:
-                                UpdateMedicine(medicineService);
+                                UpdateMedicine(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
                             case 6:
-                                FindMedicineById(medicineService);
+                                FindMedicineById(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
                             case 7:
-                                FindMedicineByName(medicineService);
+                                FindMedicineByName(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
                             case 8:
-                                FindMedicineByCategoryId(medicineService);
+                                FindMedicineByCategoryId(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
                             case 9:
-                                ShowAllCategories(categoryService);
+                                ShowAllCategories(categoryService, loggedInUser.Id);
                                 goto restartMedicineMenu;
                             case 0:
-                                Console.WriteLine("Terminating program...");
-                                systemProcess = false;
-                                break;
+                                medicineMenu = false;
+                                goto restartSystemMenu;
                             default:
                                 Color.WriteLine("Invalid command entered, please try again.", ConsoleColor.Red);
                                 goto restartMedicineMenu;
@@ -112,6 +113,7 @@ public class Program
                         }
                     }
                     break;
+
                 case 3:
                     Console.WriteLine("Terminating the program... \tGoodbye!");
                     systemProcess = false;
@@ -136,6 +138,7 @@ public class Program
             Console.Write("Enter email: ");
             string email = Console.ReadLine();
             Validations.ValidEmail(email);
+            Validations.isEmailDuplicate(email);
 
             Console.Write("Enter password: ");
             string password = Console.ReadLine();
@@ -156,6 +159,11 @@ public class Program
             Color.WriteLine(ex.Message, ConsoleColor.Red);
             goto restartRegistrationProcess;
         }
+        catch (DuplicateEmail ex)
+        {
+            Color.WriteLine(ex.Message, ConsoleColor.Red);
+            goto restartRegistrationProcess;
+        }
         catch (InvalidPassword ex)
         {
             Color.WriteLine(ex.Message, ConsoleColor.Red);
@@ -163,39 +171,8 @@ public class Program
         }
     }
 
-    private static Medicine CreateMedicine(MedicineService medicineService)
+    private static Category CreateCategory(CategoryService categoryService, int userId)
     {
-        User myUser = new("", "", "");
-        try
-        {
-            Color.WriteLine("Available categories:", ConsoleColor.Yellow);
-            DB.CategoryGetInfo(myUser.Id);
-
-            Console.Write("Category ID: ");
-            int medicineCategoryId = int.Parse(Console.ReadLine());
-
-            Console.Write("Name of medicine: ");
-            string medicineCreate = Console.ReadLine();
-
-            Console.Write("Price of medicine: ");
-            double medicinePrice = double.Parse(Console.ReadLine());
-
-
-            Medicine medicine = new Medicine(medicineCreate, medicinePrice, medicineCategoryId, myUser.Id);
-            medicineService.CreateMedicine(medicine);
-
-            Color.WriteLine("Medicine successfully created!", ConsoleColor.Green);
-        }
-        catch (NotFoundException ex)
-        {
-            Color.WriteLine(ex.Message, ConsoleColor.Red);
-        }
-        return null;
-    }
-
-    private static Category CreateCategory(CategoryService categoryService)
-    {
-        User myUser = new("", "", "");
         try
         {
             Console.Write("Name of category: ");
@@ -203,14 +180,14 @@ public class Program
 
             foreach (var prospectiveCategory in DB.Categories)
             {
-                if (categoryCreate == prospectiveCategory.Name && myUser.Id == prospectiveCategory.UserId)
+                if (categoryCreate == prospectiveCategory.Name && userId == prospectiveCategory.UserId)
                 {
                     throw new NotFoundException("Category with the given name already exists");
                 }
             }
 
 
-            Category category = new Category(categoryCreate, myUser.Id);
+            Category category = new Category(categoryCreate, userId);
             categoryService.CreateCategory(category);
             Color.WriteLine("Category successfully created!", ConsoleColor.Green);
         }
@@ -221,34 +198,34 @@ public class Program
         return null;
     }
 
-    private static Medicine RemoveMedicine(MedicineService medicineService)
+    private static Medicine CreateMedicine(MedicineService medicineService, int userId)
     {
-        User myUser = new("", "", "");
-    restartChangeChoice:
         try
         {
-            Color.WriteLine("Here are the listed medicines: ", ConsoleColor.Yellow);
-            DB.MedicineGetInfo(myUser.Id);
-
-            Console.Write("Enter the ID of the medicine you want to remove: ");
-            int removeID = int.Parse(Console.ReadLine());
-
-            Medicine findMedicineRemove = medicineService.GetMedicineById(removeID, myUser.Id);
-
-            Color.WriteLine($"You want to remove medicine '{findMedicineRemove}'? \t(Say 'yes' or 'no')", ConsoleColor.DarkRed);
-            string YesNo = Console.ReadLine();
-            if (YesNo.ToLower() == "yes")
+            Category[] categoryValidation = new Category[0];
+            if (categoryValidation.Length <= 0)
             {
-                Medicine removedMedicine = medicineService.RemoveMedicine(myUser.Id, removeID);
-                Console.WriteLine($"Medicine '{findMedicineRemove}' successfully deleted.");
-            }
-            else if (YesNo.ToLower() == "no")
-            {
-                goto restartChangeChoice;
+                Color.WriteLine("No category available yet, please try again after creating a category", ConsoleColor.Red);
             }
             else
             {
-                throw new NotFoundException("Please enter a proper option.");
+                Color.WriteLine("Available categories:", ConsoleColor.Yellow);
+                DB.CategoriesGetInfo(userId);
+
+                Console.Write("Category ID: ");
+                int medicineCategoryId = int.Parse(Console.ReadLine());
+
+                Console.Write("Name of medicine: ");
+                string medicineCreate = Console.ReadLine();
+
+                Console.Write("Price of medicine: ");
+                double medicinePrice = double.Parse(Console.ReadLine());
+
+
+                Medicine medicine = new Medicine(medicineCreate, medicinePrice, medicineCategoryId, userId);
+                medicineService.CreateMedicine(medicine);
+
+                Color.WriteLine("Medicine successfully created!", ConsoleColor.Green);
             }
         }
         catch (NotFoundException ex)
@@ -258,13 +235,67 @@ public class Program
         return null;
     }
 
-    private static Medicine ShowAllMedicines(MedicineService medicineService)
+
+    private static Medicine RemoveMedicine(MedicineService medicineService, int userId)
     {
-        User myUser = new("", "", "");
+    restartChangeChoice:
         try
         {
-            Color.WriteLine("Here are all the listed medicines: ", ConsoleColor.Yellow);
-            DB.MedicineGetInfo(myUser.Id);
+            Medicine[] medicineValidation = new Medicine[0];
+
+            if (medicineValidation.Length <= 0)
+            {
+                Color.WriteLine("No medicines available yet, please try again after creating a medicine.", ConsoleColor.Red);
+            }
+            else
+            {
+                Color.WriteLine("Here are the listed medicines: ", ConsoleColor.Yellow);
+                DB.MedicineGetInfo(userId);
+
+                Console.Write("Enter the ID of the medicine you want to remove: ");
+                int removeID = int.Parse(Console.ReadLine());
+
+                Medicine findMedicineRemove = medicineService.GetMedicineById(removeID, userId);
+
+                Color.WriteLine($"You want to remove medicine '{findMedicineRemove}'? \t(Say 'yes' or 'no')", ConsoleColor.DarkRed);
+                string YesNo = Console.ReadLine();
+                if (YesNo.ToLower() == "yes")
+                {
+                    Medicine removedMedicine = medicineService.RemoveMedicine(userId, removeID);
+                    Console.WriteLine($"Medicine '{findMedicineRemove}' successfully deleted.");
+                }
+                else if (YesNo.ToLower() == "no")
+                {
+                    goto restartChangeChoice;
+                }
+                else
+                {
+                    throw new NotFoundException("Please enter a proper option.");
+                }
+            }
+        }
+        catch (NotFoundException ex)
+        {
+            Color.WriteLine(ex.Message, ConsoleColor.Red);
+        }
+        return null;
+    }
+
+    private static Medicine ShowAllMedicines(MedicineService medicineService, int userId)
+    {
+        try
+        {
+            Medicine[] medicineValidation = new Medicine[0];
+            if (medicineValidation.Length <= 0)
+            {
+                Color.WriteLine("No medicines available yet, please try again after creating a medicine.", ConsoleColor.Red);
+
+            }
+            else
+            {
+                Color.WriteLine("Here are all the listed medicines: ", ConsoleColor.Yellow);
+                DB.MedicineGetInfo(userId);
+            }
         }
         catch (Exception ex)
         {
@@ -272,39 +303,47 @@ public class Program
         }
         return null;
     }
-    private static Medicine UpdateMedicine(MedicineService medicineService)
+    private static Medicine UpdateMedicine(MedicineService medicineService, int userId)
     {
-        User myUser = new("", "", "");
     restartUpdateProcess:
         try
         {
-            Color.WriteLine("Here are all the medicines available for update: ", ConsoleColor.Yellow);
-            DB.MedicineGetInfo(myUser.Id);
+            Medicine[] medicineValidation = new Medicine[0];
 
-            Console.Write("Enter the ID of the medicine you want to update: ");
-            int updateID = int.Parse(Console.ReadLine());
-
-            Medicine findMedicineUpdate = medicineService.GetMedicineById(updateID, myUser.Id);/////
-
-            Console.WriteLine($"You want to update medicine '{findMedicineUpdate}'? \t(Say 'yes' or 'no')");
-            string YesNoUpdate = Console.ReadLine();
-            if (YesNoUpdate == "yes")
+            if (medicineValidation.Length <= 0)
             {
-                Console.Write("New name of the medicine: ");
-                string newName = Console.ReadLine();
-                Console.Write("New price of the medicine: ");
-                double newPrice = double.Parse(Console.ReadLine());
-
-                int categoryId = findMedicineUpdate.CategoryId;
-                int userId = findMedicineUpdate.UserId;
-
-                Medicine newMedicine = new Medicine(newName, newPrice, categoryId, userId);////
-                medicineService.UpdateMedicine(findMedicineUpdate.Id, newMedicine, userId);
-                Color.WriteLine($"Medicine '{findMedicineUpdate}' successfully updated.", ConsoleColor.Green);
+                Color.WriteLine("No medicines available yet, please try again after creating a medicine.", ConsoleColor.Red);
             }
-            else if (YesNoUpdate.ToLower() == "no")
+            else
             {
-                goto restartUpdateProcess;
+                Color.WriteLine("Here are all the medicines available for update: ", ConsoleColor.Yellow);
+                DB.MedicineGetInfo(userId);
+
+                Console.Write("Enter the ID of the medicine you want to update: ");
+                int updateID = int.Parse(Console.ReadLine());
+
+                Medicine findMedicineUpdate = medicineService.GetMedicineById(updateID, userId);/////
+
+                Console.WriteLine($"You want to update medicine '{findMedicineUpdate.Name}'? \t(Say 'yes' or 'no')");
+                string YesNoUpdate = Console.ReadLine();
+                if (YesNoUpdate.ToLower() == "yes")
+                {
+                    Console.Write("New name of the medicine: ");
+                    string newName = Console.ReadLine();
+                    Console.Write("New price of the medicine: ");
+                    double newPrice = double.Parse(Console.ReadLine());
+
+                    int categoryId = findMedicineUpdate.CategoryId;
+                    userId = findMedicineUpdate.UserId;
+
+                    Medicine newMedicine = new Medicine(newName, newPrice, categoryId, userId);////
+                    medicineService.UpdateMedicine(findMedicineUpdate.Id, newMedicine, userId);
+                    Color.WriteLine($"Medicine '{findMedicineUpdate}' successfully updated.", ConsoleColor.Green);
+                }
+                else if (YesNoUpdate.ToLower() == "no")
+                {
+                    goto restartUpdateProcess;
+                }
             }
         }
         catch (NotFoundException ex)
@@ -314,15 +353,28 @@ public class Program
         return null;
     }
 
-    private static Medicine FindMedicineById(MedicineService medicineService)
+    private static Medicine FindMedicineById(MedicineService medicineService, int userId)
     {
-        User myUser = new("", "", "");
         try
         {
-            Console.Write("Enter the ID of the medicine you want to find: ");
-            int findMedicineByID = int.Parse(Console.ReadLine());
+            Medicine[] medicineValidation = new Medicine[0];
+            if (medicineValidation.Length <= 0)
+            {
+                Color.WriteLine("No medicines available yet, please try again after creating a medicine.", ConsoleColor.Red);
+            }
+            else
+            {
 
-            Console.WriteLine(medicineService.GetMedicineById(findMedicineByID, myUser.Id));////
+                Console.Write("Enter the ID of the medicine you want to find: ");
+                int findMedicineByID = int.Parse(Console.ReadLine());
+
+                Medicine medicine = medicineService.GetMedicineById(findMedicineByID, userId);
+                if (medicine != null)
+                {
+                    Color.WriteLine("Medicine found: " + medicine.Name, ConsoleColor.DarkGreen);
+                    return medicine;
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -331,15 +383,27 @@ public class Program
         return null;
     }
 
-    private static Medicine FindMedicineByName(MedicineService medicineService)
+    private static Medicine FindMedicineByName(MedicineService medicineService, int userId)
     {
-        User myUser = new("", "", "");
         try
         {
-            Console.Write("Enter the name of the medicine you want to find: ");
-            string findMedicineByName = Console.ReadLine();
+            Medicine[] medicineValidation = new Medicine[0];
+            if (medicineValidation.Length <= 0)
+            {
+                Color.WriteLine("No medicines available yet, please try again after creating a medicine.", ConsoleColor.Red);
+            }
+            else
+            {
+                Console.Write("Enter the name of the medicine you want to find: ");
+                string findMedicineByName = Console.ReadLine();
 
-            Console.WriteLine(medicineService.GetMedicineByName(findMedicineByName, myUser.Id));/////
+                Medicine medicine = medicineService.GetMedicineByName(findMedicineByName, userId);/////
+                if (medicine != null)
+                {
+                    Color.WriteLine("Medicine found: " + medicine.Name, ConsoleColor.DarkGreen);
+                    return medicine;
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -348,15 +412,27 @@ public class Program
         return null;
     }
 
-    private static Medicine FindMedicineByCategoryId(MedicineService medicineService)
+    private static Medicine FindMedicineByCategoryId(MedicineService medicineService, int userId)
     {
-        User myUser = new("", "", "");
         try
         {
-            Console.Write("Enter the category of the medicine you want to find: ");
-            int findMedicineByCategoryId = int.Parse(Console.ReadLine());
+            Medicine[] medicineValidation = new Medicine[0];
+            if (medicineValidation.Length <= 0)
+            {
+                Color.WriteLine("No medicines available yet, please try again after creating a medicine.", ConsoleColor.Red);
+            }
+            else
+            {
+                Console.Write("Enter the category of the medicine you want to find: ");
+                int findMedicineByCategoryId = int.Parse(Console.ReadLine());
 
-            Console.WriteLine(medicineService.GetMedicineByCategory(findMedicineByCategoryId, myUser.Id));
+                Medicine[] medicine = medicineService.GetMedicineByCategory(userId, findMedicineByCategoryId);
+                if (medicine != null)
+                {
+                    Color.WriteLine("Medicine found: " + medicine, ConsoleColor.DarkGreen);
+                    return medicine[0];
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -365,14 +441,20 @@ public class Program
         return null;
     }
 
-    private static Category ShowAllCategories(CategoryService categoryService)
+    private static Category ShowAllCategories(CategoryService categoryService, int userId)
     {
-        User myUser = new("", "", "");
-
         try
         {
+            Category[] categoryValidation = new Category[0];
+            if (categoryValidation.Length <= 0)
+            {
+                Color.WriteLine("No category available yet, please try again after creating a category", ConsoleColor.Red);
+            }
+            else
+            {
             Color.WriteLine("Here are all the categories:", ConsoleColor.Yellow);
-            DB.CategoryGetInfo(myUser.Id);
+            DB.CategoriesGetInfo(userId);
+            }
         }
         catch (Exception ex)
         {

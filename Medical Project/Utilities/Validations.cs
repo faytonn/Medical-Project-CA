@@ -1,4 +1,6 @@
 ﻿using Medical_Project.Exceptions;
+using Medical_Project.Models;
+using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 
 namespace Medical_Project.Utilities;
@@ -10,6 +12,7 @@ public static class Validations
         bool isUpper = false;
         bool isLower = false;
         bool isDigit = false;
+        bool isPunct = false;
 
         for (int i = 0; i < password.Length; i++)
         {
@@ -25,7 +28,11 @@ public static class Validations
             {
                 isDigit = true;
             }
-            if (isUpper && isLower && isDigit && password.Length >= 8)
+            else if (char.IsPunctuation(password[i]))
+            {
+                isPunct = true;
+            }
+            if (isUpper && isLower && isDigit || isPunct && password.Length >= 8)
             {
                 return;
             }
@@ -42,18 +49,33 @@ public static class Validations
             {
                 throw new InvalidFullName("Full Name should consist of letters and spaces only.");
             }
-        } 
+        }
         return true;
     }
 
+
     public static bool ValidEmail(string email)
     {
-        if(email.Contains("@") && email.Contains("."))
+
+        if (email.Contains("@") && email.Contains("."))
         {
             return true;
         }
-
         throw new InvalidEmail("Email should consist of '@' and '.'");
     }
+
+    //private static User[] prospectiveUsers = new User[0];
+    //public static bool isEmailDuplicate(string email, User[] prospectiveUsers)
+    //{
+    //    for (int i = 0; i < prospectiveUsers.Length; i++)
+    //    {
+    //        if (email == prospectiveUsers[i].Email)
+    //        {
+    //            throw new DuplicateEmail("This email already exists.");
+    //        }
+    //    }
+    //    return true;
+    //}
 }
+
 
