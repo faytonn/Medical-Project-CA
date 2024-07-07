@@ -13,7 +13,7 @@
             Medicines = new Medicine[0];
         }
 
-        public static void MedicineGetInfo()
+        public static void MedicineGetInfo(int userId)
         {
             foreach (var medicine in Medicines) 
             {
@@ -21,18 +21,18 @@
             }
         }
 
-        public static void CategoryGetInfo()
+        public static void CategoriesGetInfo(int userId)
         {
             Console.WriteLine("> > CATEGORIES LIST < <");
             foreach (var category in Categories)
             {
-                if(userId == category.userId)
+                if(userId == category.UserId)
                 Console.WriteLine(category);
 
             }
         }
 
-        public static void UserGetInfo()
+        public static void UserGetInfo(int userId)
         {
             Console.WriteLine("> > USERS LIST < <");
             foreach ( var user in Users)
