@@ -41,9 +41,9 @@ public class Program
                     Console.WriteLine("Login");
 
                     Console.Write("Enter email: ");
-                    string loginEmail = Console.ReadLine();
+                    string loginEmail = Console.ReadLine().Trim();
                     Console.Write("Enter password: ");
-                    string loginPassword = Console.ReadLine();
+                    string loginPassword = Console.ReadLine().Trim();
                     try
                     {
                         loggedInUser = userService.Login(loginEmail, loginPassword);
@@ -51,7 +51,7 @@ public class Program
                     }
                     catch (NotFoundException ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Color.WriteLine(ex.Message, ConsoleColor.Red);
                         goto restartSystemMenu;
                     }
 
@@ -133,19 +133,19 @@ public class Program
         try
         {
             Console.Write("Enter full name: ");
-            string fullName = Console.ReadLine();
+            string fullName = Console.ReadLine().Trim();
             Validations.ValidFullName(fullName);
 
             Console.Write("Enter email: ");
-            string email = Console.ReadLine();
+            string email = Console.ReadLine().Trim();
             Validations.ValidEmail(email);
-            if(Validations.isEmailDuplicate(email, prospectiveUser))
+            if (Validations.isEmailDuplicate(email, prospectiveUser))
             {
                 throw new DuplicateEmail("This email already exists.");
             }
 
             Console.Write("Enter password: ");
-            string password = Console.ReadLine();
+            string password = Console.ReadLine().Trim();
             Validations.ValidPassword(password);
 
             User user = new User(fullName, email, password);
@@ -173,7 +173,7 @@ public class Program
             Color.WriteLine(ex.Message, ConsoleColor.Red);
             goto restartRegistrationProcess;
         }
-        catch (NotFoundException ex) 
+        catch (NotFoundException ex)
         {
             Color.WriteLine(ex.Message, ConsoleColor.Red);
             goto restartRegistrationProcess;
@@ -185,7 +185,7 @@ public class Program
         try
         {
             Console.Write("Name of category: ");
-            string categoryCreate = Console.ReadLine();
+            string categoryCreate = Console.ReadLine().Trim();
 
             foreach (var prospectiveCategory in DB.Categories)
             {
@@ -201,6 +201,10 @@ public class Program
             Color.WriteLine("Category successfully created!", ConsoleColor.Green);
         }
         catch (NotFoundException ex)
+        {
+            Color.WriteLine(ex.Message, ConsoleColor.Red);
+        }
+        catch (IsNullException ex)
         {
             Color.WriteLine(ex.Message, ConsoleColor.Red);
         }
@@ -225,7 +229,7 @@ public class Program
                 int medicineCategoryId = int.Parse(Console.ReadLine());
 
                 Console.Write("Name of medicine: ");
-                string medicineCreate = Console.ReadLine();
+                string medicineCreate = Console.ReadLine().Trim();
 
                 Console.Write("Price of medicine: ");
                 double medicinePrice = double.Parse(Console.ReadLine());
@@ -271,7 +275,7 @@ public class Program
                 Medicine findMedicineRemove = medicineService.GetMedicineById(removeID, userId);
 
                 Color.WriteLine($"You want to remove medicine '{findMedicineRemove}'? \t(Say 'yes' or 'no')", ConsoleColor.DarkRed);
-                string YesNo = Console.ReadLine();
+                string YesNo = Console.ReadLine().Trim();
                 if (YesNo.ToLower() == "yes")
                 {
                     Medicine removedMedicine = medicineService.RemoveMedicine(userId, removeID);
@@ -302,7 +306,6 @@ public class Program
             if (medicineValidation.Length <= 0)
             {
                 Color.WriteLine("No medicines available yet, please try again after creating a medicine.", ConsoleColor.Red);
-
             }
             else
             {
@@ -436,14 +439,22 @@ public class Program
             }
             else
             {
-                Console.Write("Enter the category of the medicine you want to find: ");
+                Console.Write("Enter the category ID of the medicine you want to find: ");
                 int findMedicineByCategoryId = int.Parse(Console.ReadLine());
 
-                Medicine[] medicine = medicineService.GetMedicineByCategory(userId, findMedicineByCategoryId);
-                if (medicine != null)
+                Medicine[] medicines = medicineService.GetMedicineByCategory(userId, findMedicineByCategoryId);
+                if (medicines != null)
                 {
-                    Color.WriteLine("Medicine found: " + medicine, ConsoleColor.DarkGreen);
-                    return medicine[0];
+                    foreach (var medicine in medicines)
+                    {
+                        Color.WriteLine("Medicine found: " + medicine, ConsoleColor.DarkGreen);
+
+                    }
+
+                    if (medicines.Length == 0)
+                    {
+                        throw new NotFoundException("Medicine is not found");
+                    }
                 }
             }
         }
@@ -465,8 +476,8 @@ public class Program
             }
             else
             {
-            Color.WriteLine("Here are all the categories:", ConsoleColor.Yellow);
-            DB.CategoriesGetInfo(userId);
+                Color.WriteLine("Here are all the categories:", ConsoleColor.Yellow);
+                DB.CategoriesGetInfo(userId);
             }
         }
         catch (Exception ex)

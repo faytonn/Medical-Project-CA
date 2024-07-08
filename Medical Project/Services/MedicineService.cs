@@ -71,7 +71,8 @@ namespace Medical_Project.Services
                     result[^1] = DB.Medicines[i];
                 }
             }
-            throw new NotFoundException("Medicine with the entered category ID not found.");
+
+            return result;
         }
 
         public Medicine RemoveMedicine(int userId, int medicineId)
