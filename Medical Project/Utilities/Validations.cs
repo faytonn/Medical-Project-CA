@@ -64,18 +64,17 @@ public static class Validations
         throw new InvalidEmail("Email should consist of '@' and '.'");
     }
 
-    //private static User[] prospectiveUsers = new User[0];
-    //public static bool isEmailDuplicate(string email, User[] prospectiveUsers)
-    //{
-    //    for (int i = 0; i < prospectiveUsers.Length; i++)
-    //    {
-    //        if (email == prospectiveUsers[i].Email)
-    //        {
-    //            throw new DuplicateEmail("This email already exists.");
-    //        }
-    //    }
-    //    return true;
-    //}
+    public static bool isEmailDuplicate(string email, User[] prospectiveUsers)
+    {
+        foreach(User user in prospectiveUsers)
+        {
+            if (email == user.Email)
+            {
+                throw new DuplicateEmail("This email already exists.");
+            }
+        }
+        return false;
+    }
 }
 
 

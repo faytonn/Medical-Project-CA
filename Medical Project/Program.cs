@@ -17,7 +17,7 @@ public class Program
         CategoryService categoryService = new CategoryService();
         MedicineService medicineService = new MedicineService();
 
-
+        User[] prospectiveUser = new User[0];
         User loggedInUser = new("", "", "");
 
         while (systemProcess)
@@ -30,14 +30,14 @@ public class Program
             Console.WriteLine("[2] Log in");
             Console.WriteLine("[3] Exit");
 
-            int command = int.Parse(Console.ReadLine());
+            string command = Console.ReadLine();
 
             switch (command)
             {
-                case 1:
-                    CreateUser(userService);
+                case "1":
+                    CreateUser(userService, prospectiveUser);
                     goto restartSystemMenu;
-                case 2:
+                case "2":
                     Console.WriteLine("Login");
 
                     Console.Write("Enter email: ");
@@ -73,37 +73,38 @@ public class Program
                         Console.WriteLine("[9] List all categories");
                         Console.WriteLine("[0] Go back to User menu");
 
-                        int command2 = int.Parse(Console.ReadLine());
+                        string command2 = Console.ReadLine();
+
                         switch (command2)
                         {
-                            case 1:
+                            case "1":
                                 CreateCategory(categoryService, loggedInUser.Id);
                                 goto restartMedicineMenu;
-                            case 2:
+                            case "2":
                                 CreateMedicine(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
-                            case 3:
+                            case "3":
                                 RemoveMedicine(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
-                            case 4:
+                            case "4":
                                 ShowAllMedicines(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
-                            case 5:
+                            case "5":
                                 UpdateMedicine(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
-                            case 6:
+                            case "6":
                                 FindMedicineById(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
-                            case 7:
+                            case "7":
                                 FindMedicineByName(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
-                            case 8:
+                            case "8":
                                 FindMedicineByCategoryId(medicineService, loggedInUser.Id);
                                 goto restartMedicineMenu;
-                            case 9:
+                            case "9":
                                 ShowAllCategories(categoryService, loggedInUser.Id);
                                 goto restartMedicineMenu;
-                            case 0:
+                            case "0":
                                 medicineMenu = false;
                                 goto restartSystemMenu;
                             default:
@@ -114,7 +115,7 @@ public class Program
                     }
                     break;
 
-                case 3:
+                case "3":
                     Console.WriteLine("Terminating the program... \tGoodbye!");
                     systemProcess = false;
                     break;
@@ -126,7 +127,7 @@ public class Program
 
     }
 
-    private static void CreateUser(UserService userService)
+    private static void CreateUser(UserService userService, User[] prospectiveUser)
     {
     restartRegistrationProcess:
         try
@@ -138,7 +139,10 @@ public class Program
             Console.Write("Enter email: ");
             string email = Console.ReadLine();
             Validations.ValidEmail(email);
-            Validations.isEmailDuplicate(email);
+            if(Validations.isEmailDuplicate(email, prospectiveUser))
+            {
+                throw new DuplicateEmail("This email already exists.");
+            }
 
             Console.Write("Enter password: ");
             string password = Console.ReadLine();
@@ -165,6 +169,11 @@ public class Program
             goto restartRegistrationProcess;
         }
         catch (InvalidPassword ex)
+        {
+            Color.WriteLine(ex.Message, ConsoleColor.Red);
+            goto restartRegistrationProcess;
+        }
+        catch (NotFoundException ex) 
         {
             Color.WriteLine(ex.Message, ConsoleColor.Red);
             goto restartRegistrationProcess;
@@ -202,7 +211,7 @@ public class Program
     {
         try
         {
-            Category[] categoryValidation = new Category[0];
+            Category[] categoryValidation = DB.Categories;
             if (categoryValidation.Length <= 0)
             {
                 Color.WriteLine("No category available yet, please try again after creating a category", ConsoleColor.Red);
@@ -232,6 +241,10 @@ public class Program
         {
             Color.WriteLine(ex.Message, ConsoleColor.Red);
         }
+        catch (InvalidPrice ex)
+        {
+            Color.WriteLine(ex.Message, ConsoleColor.Red);
+        }
         return null;
     }
 
@@ -241,7 +254,7 @@ public class Program
     restartChangeChoice:
         try
         {
-            Medicine[] medicineValidation = new Medicine[0];
+            Medicine[] medicineValidation = DB.Medicines;
 
             if (medicineValidation.Length <= 0)
             {
@@ -285,7 +298,7 @@ public class Program
     {
         try
         {
-            Medicine[] medicineValidation = new Medicine[0];
+            Medicine[] medicineValidation = DB.Medicines;
             if (medicineValidation.Length <= 0)
             {
                 Color.WriteLine("No medicines available yet, please try again after creating a medicine.", ConsoleColor.Red);
@@ -308,7 +321,7 @@ public class Program
     restartUpdateProcess:
         try
         {
-            Medicine[] medicineValidation = new Medicine[0];
+            Medicine[] medicineValidation = DB.Medicines;
 
             if (medicineValidation.Length <= 0)
             {
@@ -357,7 +370,7 @@ public class Program
     {
         try
         {
-            Medicine[] medicineValidation = new Medicine[0];
+            Medicine[] medicineValidation = DB.Medicines;
             if (medicineValidation.Length <= 0)
             {
                 Color.WriteLine("No medicines available yet, please try again after creating a medicine.", ConsoleColor.Red);
@@ -387,7 +400,7 @@ public class Program
     {
         try
         {
-            Medicine[] medicineValidation = new Medicine[0];
+            Medicine[] medicineValidation = DB.Medicines;
             if (medicineValidation.Length <= 0)
             {
                 Color.WriteLine("No medicines available yet, please try again after creating a medicine.", ConsoleColor.Red);
@@ -416,7 +429,7 @@ public class Program
     {
         try
         {
-            Medicine[] medicineValidation = new Medicine[0];
+            Medicine[] medicineValidation = DB.Medicines;
             if (medicineValidation.Length <= 0)
             {
                 Color.WriteLine("No medicines available yet, please try again after creating a medicine.", ConsoleColor.Red);
@@ -445,7 +458,7 @@ public class Program
     {
         try
         {
-            Category[] categoryValidation = new Category[0];
+            Category[] categoryValidation = DB.Categories;
             if (categoryValidation.Length <= 0)
             {
                 Color.WriteLine("No category available yet, please try again after creating a category", ConsoleColor.Red);
