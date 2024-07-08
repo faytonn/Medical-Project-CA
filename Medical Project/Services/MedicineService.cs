@@ -15,7 +15,6 @@ namespace Medical_Project.Services
                 {
                     Array.Resize(ref DB.Medicines, DB.Medicines.Length + 1);
                     DB.Medicines[DB.Medicines.Length - 1] = medicine;
-                    Console.WriteLine("Medicine successfully created.");
                     return;
                 }
             }

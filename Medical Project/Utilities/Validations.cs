@@ -1,7 +1,5 @@
 ﻿using Medical_Project.Exceptions;
 using Medical_Project.Models;
-using System.Runtime.CompilerServices;
-using System.Threading.Channels;
 
 namespace Medical_Project.Utilities;
 

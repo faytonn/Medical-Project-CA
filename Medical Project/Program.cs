@@ -230,10 +230,16 @@ public class Program
 
                 Console.Write("Name of medicine: ");
                 string medicineCreate = Console.ReadLine().Trim();
+                foreach (var prospectiveMedicine in DB.Medicines)
+                {
+                    if (medicineCreate == prospectiveMedicine.Name && userId == prospectiveMedicine.UserId)
+                    {
+                        throw new DuplicateMedicine("Medicine with the given name already exists");
+                    }
+                }
 
                 Console.Write("Price of medicine: ");
                 double medicinePrice = double.Parse(Console.ReadLine());
-
 
                 Medicine medicine = new Medicine(medicineCreate, medicinePrice, medicineCategoryId, userId);
                 medicineService.CreateMedicine(medicine);
@@ -249,6 +255,11 @@ public class Program
         {
             Color.WriteLine(ex.Message, ConsoleColor.Red);
         }
+        catch(DuplicateMedicine ex) 
+        {
+            Color.WriteLine(ex.Message, ConsoleColor.Red);
+        }
+
         return null;
     }
 
