@@ -69,7 +69,7 @@ public class Program
                         Console.WriteLine("[5] Update a medicine");
                         Console.WriteLine("[6] Find medicine by ID");
                         Console.WriteLine("[7] Find medicine by name");
-                        Console.WriteLine("[8] Find medicine by category");
+                        Console.WriteLine("[8] Find medicine by category ID");
                         Console.WriteLine("[9] List all categories");
                         Console.WriteLine("[0] Go back to User menu");
 
