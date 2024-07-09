@@ -23,13 +23,14 @@ namespace Medical_Project.Services
 
         public void GetAllMedicines(int userId)
         {
-           foreach(var medicine in DB.Medicines)
+            foreach (var medicine in DB.Medicines)
             {
-                if(medicine.UserId == userId)
+                if (medicine.UserId == userId)
                 {
                     Console.WriteLine(medicine);
                 }
             }
+            throw new NotFoundException("No medicines available yet.");
         }
 
         public Medicine GetMedicineById(int medicineId, int userId)
@@ -62,7 +63,7 @@ namespace Medical_Project.Services
         {
             Medicine[] result = new Medicine[0];
 
-            for(int i = 0; i < DB.Medicines.Length; i++) 
+            for (int i = 0; i < DB.Medicines.Length; i++)
             {
                 if (DB.Medicines[i].CategoryId == categoryId && DB.Medicines[i].UserId == userId)
                 {
@@ -96,7 +97,7 @@ namespace Medical_Project.Services
 
         public Medicine UpdateMedicine(int id, Medicine medicine, int userId)
         {
-            for(int i = 0; i < DB.Medicines.Length; i++)
+            for (int i = 0; i < DB.Medicines.Length; i++)
             {
                 if (DB.Medicines[i].Id == id && DB.Medicines[i].UserId == userId)
                 {
@@ -109,7 +110,7 @@ namespace Medical_Project.Services
                     return updatedMedicine;
                 }
             }
-            throw new NotFoundException("Medicine with the entered ID not found.");
+            throw new NotFoundException("Category with the entered ID not found.");
         }
 
     }

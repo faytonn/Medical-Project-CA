@@ -55,7 +55,7 @@ public static class Validations
     public static bool ValidEmail(string email)
     {
 
-        if (email.Contains("@") && email.Contains("."))
+        if (email.Contains('@') && email.Contains('.'))
         {
             return true;
         }

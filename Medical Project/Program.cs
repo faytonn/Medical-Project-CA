@@ -259,6 +259,10 @@ public class Program
         {
             Color.WriteLine(ex.Message, ConsoleColor.Red);
         }
+        catch(Exception ex) 
+        {
+            Color.WriteLine(ex.Message, ConsoleColor.Red);
+        }
 
         return null;
     }
@@ -266,7 +270,6 @@ public class Program
 
     private static Medicine RemoveMedicine(MedicineService medicineService, int userId)
     {
-    restartChangeChoice:
         try
         {
             Medicine[] medicineValidation = DB.Medicines;
@@ -277,6 +280,7 @@ public class Program
             }
             else
             {
+    restartChangeChoice:
                 Color.WriteLine("Here are the listed medicines: ", ConsoleColor.Yellow);
                 DB.MedicineGetInfo(userId);
 
@@ -298,11 +302,16 @@ public class Program
                 }
                 else
                 {
+                    goto restartChangeChoice;
                     throw new NotFoundException("Please enter a proper option.");
                 }
             }
         }
         catch (NotFoundException ex)
+        {
+            Color.WriteLine(ex.Message, ConsoleColor.Red);
+        }
+        catch(Exception ex)
         {
             Color.WriteLine(ex.Message, ConsoleColor.Red);
         }
@@ -324,6 +333,10 @@ public class Program
                 DB.MedicineGetInfo(userId);
             }
         }
+        catch (NotFoundException ex)
+        {
+            Color.WriteLine(ex.Message, ConsoleColor.Red);
+        }
         catch (Exception ex)
         {
             Color.WriteLine(ex.Message, ConsoleColor.Red);
@@ -332,7 +345,6 @@ public class Program
     }
     private static Medicine UpdateMedicine(MedicineService medicineService, int userId)
     {
-    restartUpdateProcess:
         try
         {
             Medicine[] medicineValidation = DB.Medicines;
@@ -343,6 +355,7 @@ public class Program
             }
             else
             {
+    restartUpdateProcess:
                 Color.WriteLine("Here are all the medicines available for update: ", ConsoleColor.Yellow);
                 DB.MedicineGetInfo(userId);
 
@@ -351,7 +364,7 @@ public class Program
 
                 Medicine findMedicineUpdate = medicineService.GetMedicineById(updateID, userId);/////
 
-                Console.WriteLine($"You want to update medicine '{findMedicineUpdate.Name}'? \t(Say 'yes' or 'no')");
+                Color.WriteLine($"You want to update medicine '{findMedicineUpdate.Name}'? \t(Say 'yes' or 'no')", ConsoleColor.DarkYellow);
                 string YesNoUpdate = Console.ReadLine();
                 if (YesNoUpdate.ToLower() == "yes")
                 {
@@ -371,9 +384,41 @@ public class Program
                 {
                     goto restartUpdateProcess;
                 }
+                else
+                {
+                    Color.WriteLine("Please enter a proper option.", ConsoleColor.Red);
+                    goto restartUpdateProcess;
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             }
         }
         catch (NotFoundException ex)
+        {
+            Color.WriteLine(ex.Message, ConsoleColor.Red);
+        }
+        catch (Exception ex)
         {
             Color.WriteLine(ex.Message, ConsoleColor.Red);
         }
@@ -401,6 +446,7 @@ public class Program
                     Color.WriteLine("Medicine found: " + medicine.Name, ConsoleColor.DarkGreen);
                     return medicine;
                 }
+
             }
         }
         catch (Exception ex)
@@ -475,7 +521,6 @@ public class Program
         }
         return null;
     }
-
     private static Category ShowAllCategories(CategoryService categoryService, int userId)
     {
         try
@@ -496,6 +541,8 @@ public class Program
             Color.WriteLine(ex.Message, ConsoleColor.Red);
         }
         return null;
+
+
     }
 }
 
