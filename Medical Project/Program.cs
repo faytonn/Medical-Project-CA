@@ -134,6 +134,10 @@ public class Program
         {
             Console.Write("Enter full name: ");
             string fullName = Console.ReadLine().Trim();
+            if (string.IsNullOrWhiteSpace(fullName))
+            {
+                throw new IsNullException("You can not enter an empty space");
+            }
             Validations.ValidFullName(fullName);
 
             Console.Write("Enter email: ");
@@ -173,7 +177,17 @@ public class Program
             Color.WriteLine(ex.Message, ConsoleColor.Red);
             goto restartRegistrationProcess;
         }
+        catch(IsNullException ex)
+        {
+            Color.WriteLine(ex.Message, ConsoleColor.Red);
+            goto restartRegistrationProcess;
+        }
         catch (NotFoundException ex)
+        {
+            Color.WriteLine(ex.Message, ConsoleColor.Red);
+            goto restartRegistrationProcess;
+        }
+        catch(Exception ex)
         {
             Color.WriteLine(ex.Message, ConsoleColor.Red);
             goto restartRegistrationProcess;
@@ -186,6 +200,11 @@ public class Program
         {
             Console.Write("Name of category: ");
             string categoryCreate = Console.ReadLine().Trim();
+
+            if(string.IsNullOrWhiteSpace(categoryCreate))
+            {
+                throw new IsNullException("You can not enter an empty space");
+            }
 
             foreach (var prospectiveCategory in DB.Categories)
             {
@@ -230,6 +249,11 @@ public class Program
 
                 Console.Write("Name of medicine: ");
                 string medicineCreate = Console.ReadLine().Trim();
+
+            if (string.IsNullOrWhiteSpace(medicineCreate))
+            {
+                throw new IsNullException("You can not enter an empty space");
+            }
                 foreach (var prospectiveMedicine in DB.Medicines)
                 {
                     if (medicineCreate == prospectiveMedicine.Name && userId == prospectiveMedicine.UserId)
@@ -256,6 +280,10 @@ public class Program
             Color.WriteLine(ex.Message, ConsoleColor.Red);
         }
         catch(DuplicateMedicine ex) 
+        {
+            Color.WriteLine(ex.Message, ConsoleColor.Red);
+        }
+        catch(IsNullException ex)
         {
             Color.WriteLine(ex.Message, ConsoleColor.Red);
         }
@@ -389,29 +417,6 @@ public class Program
                     Color.WriteLine("Please enter a proper option.", ConsoleColor.Red);
                     goto restartUpdateProcess;
                 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             }
         }
         catch (NotFoundException ex)
@@ -468,7 +473,7 @@ public class Program
             else
             {
                 Console.Write("Enter the name of the medicine you want to find: ");
-                string findMedicineByName = Console.ReadLine();
+                string findMedicineByName = Console.ReadLine().ToLower();
 
                 Medicine medicine = medicineService.GetMedicineByName(findMedicineByName, userId);/////
                 if (medicine != null)
